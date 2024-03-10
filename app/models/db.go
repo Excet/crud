@@ -1,6 +1,6 @@
 package models
 
-type Graphs struct {
+type GraphNode struct {
 	ID       int64   `db:"id"`
 	Name     string  `db:"name"`
 	Children []int64 `db:"children"`
