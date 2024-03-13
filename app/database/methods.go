@@ -28,12 +28,12 @@ func (p *Postgres) GetNodeParent(node models.GraphNode) (models.GraphNode, error
 			zap.Error(err))
 	}
 
-	parentNode, err := ConvertRowsToGraphNode(parent)
+	parentNode, err := pgx.CollectOneRow[models.GraphNode](parent, pgx.RowToStructByName[models.GraphNode])
 
 	if err != nil {
 		p.Log.Error("Error while getting parent node. The node probably is ROOT",
 			zap.Error(err))
-		return parentNode, nil
+		return models.GraphNode{}, nil
 	}
 
 	return parentNode, nil

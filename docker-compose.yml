@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   app:
-    container_name: grpc-crud
+    container_name: crud
     build: ./
     env_file:
       - .env
