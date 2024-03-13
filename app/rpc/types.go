@@ -14,7 +14,7 @@ type Server struct {
 }
 
 type RPCIface interface {
-	GetNodeParents(node models.GraphNode) ([]models.GraphNode, error)
+	GetNodeParent(node models.GraphNode) (models.GraphNode, error)
 	GetNodePrice(node models.GraphNode) (error, price int32)
 	SetNodePrice(node models.GraphNode) error
 }

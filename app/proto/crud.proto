@@ -5,7 +5,7 @@ package crud;
 option go_package = "crud/app/proto";
 
 service Crud{
-    rpc GetNodeParents(Node) returns (stream Node){}
+    rpc GetNodeParent(Node) returns (Node){}
     rpc GetNodePrice(Node) returns (Price){}
     rpc SetNodePrice(Node) returns (Ok){}
 }
