@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package crud;
+
+option go_package = "crud/app/proto";
+
+service Crud{
+    rpc GetNodeParents(Node) returns (stream Node){}
+    rpc GetNodePrice(Node) returns (Price){}
+    rpc SetNodePrice(Node) returns (Ok){}
+}
+
+message Node{
+    string type = 1;
+    int32 id = 2;
+    Node parent = 3;
+    Price price = 4;
+}
+
+message Ok{
+    bool ok = 1;
+}
+
+message Price{
+    int32 price = 1;
+}

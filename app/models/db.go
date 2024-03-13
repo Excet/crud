@@ -1,8 +1,9 @@
 package models
 
 type GraphNode struct {
-	ID       int64   `db:"id"`
-	Name     string  `db:"name"`
-	Children []int64 `db:"children"`
-	Parent   int64   `db:"parent"`
+	ID     int32  `db:"id"`
+	Type   string `db:"type"`
+	Name   string `db:"name"`
+	Parent int32  `db:"parent"`
+	Price  int32  `db:"price"`
 }
