@@ -13,7 +13,7 @@ service Crud{
 message Node{
     string type = 1;
     int32 id = 2;
-    repeated Node parents = 3;
+    Node parent = 3;
     Price price = 4;
 }
 
