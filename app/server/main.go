@@ -30,10 +30,6 @@ func main() {
 	}
 	pb.RegisterCrudServer(s, &rpc.Server{PG: pgInstance, Log: logger})
 
-	if err := insertDefaultUser(pgInstance); err != nil {
-		logger.Fatal("error while creating default user", zap.Error(err))
-	}
-
 	if err := s.Serve(lis); err != nil {
 		logger.Fatal("error while serving server", zap.Error(err))
 	}
