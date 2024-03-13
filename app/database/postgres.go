@@ -7,7 +7,6 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
@@ -22,7 +21,7 @@ type PgxIface interface {
 
 type Postgres struct {
 	DB  PgxIface
-	Log *zerolog.Logger
+	Log *zap.Logger
 }
 
 var (

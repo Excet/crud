@@ -2,16 +2,15 @@ package rpc
 
 import (
 	"crud/app/models"
-
 	pb "crud/app/proto"
 
-	"github.com/rs/zerolog"
+	"go.uber.org/zap"
 )
 
 type Server struct {
 	pb.UnimplementedCrudServer
 	PG  RPCIface
-	Log *zerolog.Logger
+	Log *zap.Logger
 }
 
 type RPCIface interface {
