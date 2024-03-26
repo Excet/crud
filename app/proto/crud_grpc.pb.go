@@ -18,7 +18,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CrudClient interface {
-	GetNodeParents(ctx context.Context, in *Node, opts ...grpc.CallOption) (Crud_GetNodeParentsClient, error)
+	GetNodeParent(ctx context.Context, in *Node, opts ...grpc.CallOption) (*Node, error)
 	GetNodePrice(ctx context.Context, in *Node, opts ...grpc.CallOption) (*Price, error)
 	SetNodePrice(ctx context.Context, in *Node, opts ...grpc.CallOption) (*Ok, error)
 }
@@ -31,36 +31,13 @@ func NewCrudClient(cc grpc.ClientConnInterface) CrudClient {
 	return &crudClient{cc}
 }
 
-func (c *crudClient) GetNodeParents(ctx context.Context, in *Node, opts ...grpc.CallOption) (Crud_GetNodeParentsClient, error) {
-	stream, err := c.cc.NewStream(ctx, &Crud_ServiceDesc.Streams[0], "/crud.Crud/GetNodeParents", opts...)
+func (c *crudClient) GetNodeParent(ctx context.Context, in *Node, opts ...grpc.CallOption) (*Node, error) {
+	out := new(Node)
+	err := c.cc.Invoke(ctx, "/crud.Crud/GetNodeParent", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &crudGetNodeParentsClient{stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
-}
-
-type Crud_GetNodeParentsClient interface {
-	Recv() (*Node, error)
-	grpc.ClientStream
-}
-
-type crudGetNodeParentsClient struct {
-	grpc.ClientStream
-}
-
-func (x *crudGetNodeParentsClient) Recv() (*Node, error) {
-	m := new(Node)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
+	return out, nil
 }
 
 func (c *crudClient) GetNodePrice(ctx context.Context, in *Node, opts ...grpc.CallOption) (*Price, error) {
@@ -85,7 +62,7 @@ func (c *crudClient) SetNodePrice(ctx context.Context, in *Node, opts ...grpc.Ca
 // All implementations must embed UnimplementedCrudServer
 // for forward compatibility
 type CrudServer interface {
-	GetNodeParents(*Node, Crud_GetNodeParentsServer) error
+	GetNodeParent(context.Context, *Node) (*Node, error)
 	GetNodePrice(context.Context, *Node) (*Price, error)
 	SetNodePrice(context.Context, *Node) (*Ok, error)
 	mustEmbedUnimplementedCrudServer()
@@ -95,8 +72,8 @@ type CrudServer interface {
 type UnimplementedCrudServer struct {
 }
 
-func (UnimplementedCrudServer) GetNodeParents(*Node, Crud_GetNodeParentsServer) error {
-	return status.Errorf(codes.Unimplemented, "method GetNodeParents not implemented")
+func (UnimplementedCrudServer) GetNodeParent(context.Context, *Node) (*Node, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetNodeParent not implemented")
 }
 func (UnimplementedCrudServer) GetNodePrice(context.Context, *Node) (*Price, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetNodePrice not implemented")
@@ -117,25 +94,22 @@ func RegisterCrudServer(s grpc.ServiceRegistrar, srv CrudServer) {
 	s.RegisterService(&Crud_ServiceDesc, srv)
 }
 
-func _Crud_GetNodeParents_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(Node)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
+func _Crud_GetNodeParent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Node)
+	if err := dec(in); err != nil {
+		return nil, err
 	}
-	return srv.(CrudServer).GetNodeParents(m, &crudGetNodeParentsServer{stream})
-}
-
-type Crud_GetNodeParentsServer interface {
-	Send(*Node) error
-	grpc.ServerStream
-}
-
-type crudGetNodeParentsServer struct {
-	grpc.ServerStream
-}
-
-func (x *crudGetNodeParentsServer) Send(m *Node) error {
-	return x.ServerStream.SendMsg(m)
+	if interceptor == nil {
+		return srv.(CrudServer).GetNodeParent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/crud.Crud/GetNodeParent",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CrudServer).GetNodeParent(ctx, req.(*Node))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Crud_GetNodePrice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -182,6 +156,10 @@ var Crud_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*CrudServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
+			MethodName: "GetNodeParent",
+			Handler:    _Crud_GetNodeParent_Handler,
+		},
+		{
 			MethodName: "GetNodePrice",
 			Handler:    _Crud_GetNodePrice_Handler,
 		},
@@ -190,12 +168,6 @@ var Crud_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Crud_SetNodePrice_Handler,
 		},
 	},
-	Streams: []grpc.StreamDesc{
-		{
-			StreamName:    "GetNodeParents",
-			Handler:       _Crud_GetNodeParents_Handler,
-			ServerStreams: true,
-		},
-	},
+	Streams:  []grpc.StreamDesc{},
 	Metadata: "app/proto/crud.proto",
 }
